@@ -5,6 +5,9 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+
+    weatherapi "pb/nowwhat/weather"
+    "reflect"
 )
 
 
@@ -39,6 +42,24 @@ func main(){
             "utc" : time.Now().UTC().Format("15:04:05.000000"),
         })
 
+
+    })
+
+    r.GET("w/:location" , func(c *gin.Context){
+        location := c.Params.ByName("location")
+        wdata := weatherapi.GetWeather(location)
+        r:= reflect.ValueOf(wdata)
+        tempc := reflect.Indirect(r).FieldByName("tempc").Float()
+        status := reflect.Indirect(r).FieldByName("status").String()
+        lat :=  reflect.Indirect(r).FieldByName("lat").Float()
+        long := reflect.Indirect(r).FieldByName("long").Float()
+        
+        c.JSON(200 , gin.H{
+            "tempc" : tempc,
+            "weather" : status,
+            "lat" : lat,
+            "long" : long,
+        })
 
     })
     
